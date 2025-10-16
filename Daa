@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dijkstra's Shortest Path - Cities Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      color: #333;
+      margin: 40px;
+      text-align: center;
+    }
+    h1 {
+      color: #0078d7;
+    }
+    pre {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      width: 80%;
+      margin: 20px auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dijkstra's Shortest Path Finder</h1>
+  <p><strong>From City:</strong> Nagpur</p>
+  <pre id="output">Calculating shortest distances...</pre>
+
+  <footer>
+    Created by Gauri Yadav | Example for GitHub Project Submission 🚀
+  </footer>
+
+  <script>
+    // Dijkstra's Algorithm in JavaScript
+    function dijkstra(graph, start) {
+      const distances = {};
+      const pq = [];
+
+      // Initialize distances
+      for (const node in graph) {
+        distances[node] = Infinity;
+      }
+      distances[start] = 0;
+
+      pq.push([0, start]);
+
+      while (pq.length > 0) {
+        pq.sort((a, b) => a[0] - b[0]); // sort by distance
+        const [currentDistance, currentNode] = pq.shift();
+
+        if (currentDistance > distances[currentNode]) continue;
+
+        for (const neighbor in graph[currentNode]) {
+          const weight = graph[currentNode][neighbor];
+          const distance = currentDistance + weight;
+
+          if (distance < distances[neighbor]) {
+            distances[neighbor] = distance;
+            pq.push([distance, neighbor]);
+          }
+        }
+      }
+
+      return distances;
+    }
+
+    // Graph (cities and distances)
+    const graph = {
+      'Nagpur': {'Wardha': 80, 'Amravati': 155},
+      'Wardha': {'Nagpur': 80, 'Chandrapur': 90, 'Amravati': 140},
+      'Amravati': {'Nagpur': 155, 'Wardha': 140, 'Chandrapur': 200},
+      'Chandrapur': {'Wardha': 90, 'Amravati': 200}
+    };
+
+    const startCity = 'Nagpur';
+    const shortestPaths = dijkstra(graph, startCity);
+
+    // Display results
+    let outputText = `Shortest distances from ${startCity}:\n\n`;
+    for (const city in shortestPaths) {
+      outputText += `${startCity} → ${city} = ${shortestPaths[city]} km\n`;
+    }
+
+    document.getElementById("output").textContent = outputText;
+  </script>
+</body>
+</html>
