@@ -1,0 +1,75 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import heapq
+
+# ---------------------- Dijkstra Algorithm ----------------------
+def dijkstra(graph, start):
+    shortest_distance = {node: float('inf') for node in graph}
+    shortest_distance[start] = 0
+    pq = [(0, start)]
+
+    while pq:
+        current_distance, current_node = heapq.heappop(pq)
+
+        if current_distance > shortest_distance[current_node]:
+            continue
+
+        for neighbor, weight in graph[current_node].items():
+            distance = current_distance + weight
+            if distance < shortest_distance[neighbor]:
+                shortest_distance[neighbor] = distance
+                heapq.heappush(pq, (distance, neighbor))
+
+    return shortest_distance
+
+
+# ---------------------- Graph Data ----------------------
+graph = {
+    'Nagpur': {'Wardha': 80, 'Amravati': 155},
+    'Wardha': {'Nagpur': 80, 'Chandrapur': 90, 'Amravati': 140},
+    'Amravati': {'Nagpur': 155, 'Wardha': 140, 'Chandrapur': 200},
+    'Chandrapur': {'Wardha': 90, 'Amravati': 200}
+}
+
+
+# ---------------------- UI Functions ----------------------
+def find_shortest_paths():
+    start_city = city_var.get()
+    if not start_city:
+        messagebox.showwarning("Warning", "Please select a starting city!")
+        return
+
+    result = dijkstra(graph, start_city)
+    output_text.delete(1.0, tk.END)
+    output_text.insert(tk.END, f"Shortest distances from {start_city}:\n\n")
+
+    for city, distance in result.items():
+        output_text.insert(tk.END, f"{start_city} → {city} = {distance} km\n")
+
+
+# ---------------------- Tkinter UI ----------------------
+root = tk.Tk()
+root.title("Dijkstra Shortest Path Finder")
+root.geometry("500x400")
+root.config(bg="#e3f2fd")
+
+# Title Label
+tk.Label(root, text="🚗 Dijkstra Shortest Path Finder", font=("Arial", 16, "bold"), bg="#e3f2fd", fg="#0d47a1").pack(pady=15)
+
+# Dropdown menu
+frame = tk.Frame(root, bg="#e3f2fd")
+frame.pack(pady=10)
+
+tk.Label(frame, text="Select Starting City:", bg="#e3f2fd", font=("Arial", 12)).grid(row=0, column=0, padx=5)
+
+city_var = tk.StringVar()
+city_dropdown = ttk.Combobox(frame, textvariable=city_var, values=list(graph.keys()), state="readonly", width=20)
+city_dropdown.grid(row=0, column=1, padx=5)
+
+# Button
+tk.Button(root, text="Find Shortest Paths", font=("Arial", 12, "bold"), bg="#2196f3", fg="white",
+          relief="raised", command=find_shortest_paths).pack(pady=10)
+
+# Output Text Box
+output_text = tk.Text(root, height=10, width=50, wrap="word", bg="#f1f8e9", font=("Courier", 11))
+output_text.pack(pady=10)
